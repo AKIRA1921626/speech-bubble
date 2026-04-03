@@ -12,13 +12,12 @@
 --track@balloon_tail_size:しっぽサイズ,0,1000,100
 --track@balloon_tailx:しっぽサイズX,0,1000,100
 --track@balloon_taily:しっぽサイズY,0,1000,100
---track@balloon_tail_posx:しっぽ位置X,-1000,1000,-180
---track@balloon_tail_posy:しっぽ位置Y,-1000,1000,200
+--track@balloon_tail_posx:しっぽ位置X,-1000,1000,-150
+--track@balloon_tail_posy:しっぽ位置Y,-1000,1000,220
 --track@balloon_tail_slop:しっぽ傾き,-1000,1000,0
 
-obj.setoption("dst","tmp",1000,1000)
-
-obj.copybuffer("cache:1","object")
+obj.setanchor("balloon_tail_posx,balloon_tail_posy",0)
+obj.copybuffer("cache:fukidashi_text","object")
 
 ---------------　フキダシの選定と描画
 
@@ -37,6 +36,14 @@ local balloon_names = {
 local used_balloon_type = balloon_names[balloon_shapes] or "円" -- 円がふきだしで使う場合の最も無難な形であると判断したため、ここは"円"としている。
 
 obj.load("figure",used_balloon_type,balloon_col,balloon_size)
+
+-- 仮想バッファのサイズを指定するための変数
+local w,h = obj.getpixel()
+local temp_w = math.min(w + balloon_size + balloon_x + math.abs(balloon_posx) + math.abs(text_posx) + math.abs(balloon_tail_posx),obj.screen_w)
+local temp_h = math.min(h + balloon_size + balloon_y + math.abs(balloon_posy) + math.abs(text_posy) + math.abs(balloon_tail_posy),obj.screen_h)
+-- 上記変数を使用し仮想バッファを作成
+obj.setoption("dst","tmp",temp_w,temp_h)
+
 obj.effect("リサイズ","拡大率",100,"X",balloon_x,"Y",balloon_y)
 local oz,zoom,alpha,rx,ry = 0,1,1,0,0
 obj.draw(balloon_posx,balloon_posy,oz,zoom,alpha,rx,ry,balloon_rotate)
@@ -65,7 +72,7 @@ obj.draw(balloon_tail_posx,balloon_tail_posy,oz,zoom,alpha,rx,ry,balloon_tail_sl
 
 ---------------　テキストの描画
 
-obj.copybuffer("object","cache:1")
+obj.copybuffer("object","cache:fukidashi_text")
 obj.draw(text_posx,text_posy)
 obj.load("tempbuffer")
 obj.setoption("dst","frm")
