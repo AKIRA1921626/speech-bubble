@@ -1,0 +1,71 @@
+--select@balloon_shapes:フキダシ図形=1,円=1,四角形=2,三角形=3,五角形=4,六角形=5,星型=6,ハート=7
+--track@balloon_size:フキダシサイズ,0,1000,600
+--track@balloon_x:フキダシサイズX,0,1000,75
+--track@balloon_y:フキダシサイズY,0,1000,100
+--track@balloon_posx:フキダシ位置X,-1000,1000,0
+--track@balloon_posy:フキダシ位置Y,-1000,1000,0
+--track@balloon_rotate:フキダシ回転,-1000,1000,0
+--color@balloon_col:フキダシ色,0x149678
+--track@text_posx:文字位置X,-1000,1000,0
+--track@text_posy:文字位置Y,-1000,1000,0
+--select@balloon_tail_shapes:しっぽ図形=3,円=1,四角形=2,三角形=3,五角形=4,六角形=5,星型=6,ハート=7
+--track@balloon_tail_size:しっぽサイズ,0,1000,100
+--track@balloon_tailx:しっぽサイズX,0,1000,100
+--track@balloon_taily:しっぽサイズY,0,1000,100
+--track@balloon_tail_posx:しっぽ位置X,-1000,1000,-180
+--track@balloon_tail_posy:しっぽ位置Y,-1000,1000,200
+--track@balloon_tail_slop:しっぽ傾き,-1000,1000,0
+
+obj.setoption("dst","tmp",1000,1000)
+
+obj.copybuffer("cache:1","object")
+
+---------------　フキダシの選定と描画
+
+local balloon_names = {
+    [1] = "円",
+    [2] = "四角形",
+    [3] = "三角形",
+    [4] = "五角形",
+    [5] = "六角形",
+    [6] = "星型",
+    [7] = "ハート"
+}
+
+-- balloon_shapesの数値によって、used_balloon_typeに文字列を代入。
+-- 前者balloon_names[]の判定が真ならorの後は実行されない。何らかの理由で前者が実行されなかった場合だけ後者の"円"が入る。
+local used_balloon_type = balloon_names[balloon_shapes] or "円" -- 円がふきだしで使う場合の最も無難な形であると判断したため、ここは"円"としている。
+
+obj.load("figure",used_balloon_type,balloon_col,balloon_size)
+obj.effect("リサイズ","拡大率",100,"X",balloon_x,"Y",balloon_y)
+local oz,zoom,alpha,rx,ry = 0,1,1,0,0
+obj.draw(balloon_posx,balloon_posy,oz,zoom,alpha,rx,ry,balloon_rotate)
+
+---------------　しっぽの選定と描画
+
+local tail_names = {
+    [1] = "円",
+    [2] = "四角形",
+    [3] = "三角形",
+    [4] = "五角形",
+    [5] = "六角形",
+    [6] = "星型",
+    [7] = "ハート"
+}
+
+-- balloon_tail_shapesの数値によって、used_tail_typに文字列を代入。
+-- 前者tail_names[]の判定が真ならorの後は実行されない。何らかの理由で前者が実行されなかった場合だけ後者の"三角形"が入る。
+local used_tail_type = tail_names[balloon_tail_shapes] or "三角形" -- 三角形がふきだしのしっぽで使う場合の最も無難な形であると判断したため、ここは"三角形"としている。
+
+obj.load("figure",used_tail_type,balloon_col,balloon_tail_size)
+obj.effect("リサイズ","拡大率",100,"X",balloon_tailx,"Y",balloon_taily)
+
+-- 下記では、フキダシのdraw()の時に使用した oz,zoom,alpha,rx,ry の変数を使用している。
+obj.draw(balloon_tail_posx,balloon_tail_posy,oz,zoom,alpha,rx,ry,balloon_tail_slop)
+
+---------------　テキストの描画
+
+obj.copybuffer("object","cache:1")
+obj.draw(text_posx,text_posy)
+obj.load("tempbuffer")
+obj.setoption("dst","frm")
